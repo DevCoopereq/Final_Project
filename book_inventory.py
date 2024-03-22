@@ -1,6 +1,29 @@
 from datetime import date
 
 
+def get_user_name():
+    # Get name
+    while True:
+        user_name = input("Enter your name: ")
+        if len(user_name) <= 0 or len(user_name) > 20:
+            print("Invalid Name.")
+            continue
+        else:
+            return user_name
+
+
+def get_user_ID():
+    # Get Membership Number
+    while True:
+        membership_number = input("Enter your nembership number: ")
+        if len(membership_number) != 6 or membership_number.isnumeric() == False:
+            print(
+                "Invalid Membership number. [Number must be numeric and 6 digits long.]")
+            continue
+        else:
+            return membership_number
+
+
 def get_book(title):
     with open("book_inventory.txt", "r") as file:
         for line in file:
@@ -33,24 +56,12 @@ def update_borrowed_books(user, book):
 
 
 def borrow_book():
+
     # Get name
-    while True:
-        user_name = input("Enter your name: ")
-        if len(user_name) <= 0 or len(user_name) > 20:
-            print("Invalid Name.")
-            continue
-        else:
-            break
+    user_name = get_user_name()
     # Get Membership Number
-    while True:
-        membership_number = input("Enter your nembership number: ")
-        if len(membership_number) != 6 or membership_number.isnumeric() == False:
-            print(
-                "Invalid Membership number. [Number must be numeric and 6 digits long.]")
-            continue
-        else:
-            break
-     # Get a Book title
+    membership_number = get_user_ID()
+    # Get a Book title
     while True:
         book_title = input("Enter the book title you want to borrow: ")
         # Ensure the book title entered is valid.
@@ -72,7 +83,7 @@ def borrow_book():
 
 
 def return_book():
-    print("Return book")
+    print(":")
 
 
 def review_borrowed_books():
@@ -126,8 +137,4 @@ def main():
                 return
 
 
-# main()
-# print(get_book("The Road"))
-
 borrow_book()
-# update_inventory("The Road", "10", "0")
