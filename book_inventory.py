@@ -32,6 +32,12 @@ def get_book(title):
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
 
 
+def get_books():
+    with open("book_inventory.txt", "r") as file:
+        for line in file:
+            print(line.strip())
+
+
 def update_inventory(title, stock, borrowed):
     with open("book_inventory.txt", "r") as file:
         lines = file.readlines()
@@ -83,7 +89,7 @@ def borrow_book():
 
 
 def return_book():
-    print(":")
+    print(";")
 
 
 def review_borrowed_books():
@@ -137,4 +143,5 @@ def main():
                 return
 
 
-borrow_book()
+# borrow_book()
+get_books()
