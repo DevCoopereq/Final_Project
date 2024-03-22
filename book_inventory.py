@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 
 
 def get_book(title):
@@ -20,6 +20,15 @@ def update_inventory(title, stock, borrowed):
             lines[i] = f"{book_title}-{author}-{stock}-{borrowed}\n"
             break
     with open("book_inventory.txt", "w") as file:
+        file.writelines(lines)
+
+
+def update_borrowed_books(user, book):
+    with open("borrowed_books.txt", "r") as file:
+        lines = file.readlines()
+
+    lines.append(f"{user['name']}-{user['memberID']}-{book}-{date.today()}\n")
+    with open("borrowed_books.txt", "w") as file:
         file.writelines(lines)
 
 
@@ -56,6 +65,9 @@ def borrow_book():
             book["in_stock"])-1, int(book["borrowed"])+1)
         print(
             f"You have borrowed {book['title']} written by {book['author']}, please return a book back in 7 days.")
+        update_borrowed_books(
+            {"name": user_name, "memberID": membership_number},
+            book["title"])
         return
 
 
