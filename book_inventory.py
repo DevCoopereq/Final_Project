@@ -24,11 +24,29 @@ def get_user_ID():
             return membership_number
 
 
+def get_user_books(user_name="", user_id=""):
+    user_book = []
+    print(user_name, user_id)
+    if len(user_name) > 0 or len(user_id) > 0:
+        with open("borrowed_books.txt", "r") as file:
+            for line in file:
+                entry = line.strip()
+                parts = entry.split("==")
+
+                if len(parts) == 4:
+                    users_name, user_membership, book_title, borrow_date = parts
+                    if user_name == users_name or user_id == user_membership:
+                        user_book.append(
+                            {"user_name": parts[0], "user_id": parts[1], "book_title": parts[2], "borrow_date": parts[3]})
+        return user_book
+    return None
+
+
 def get_book(title):
     with open("book_inventory.txt", "r") as file:
         for line in file:
             if title in line:
-                parts = line.strip().split("-")
+                parts = line.strip().split("==")
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
 
 
@@ -45,7 +63,7 @@ def update_inventory(title, stock, borrowed):
     for i, line in enumerate(lines):
         if title in line:
             book_title, author, in_stock, out_stock = lines[i].strip().split(
-                "-")
+                "==")
             lines[i] = f"{book_title}-{author}-{stock}-{borrowed}\n"
             break
     with open("book_inventory.txt", "w") as file:
@@ -89,7 +107,7 @@ def borrow_book():
 
 
 def return_book():
-    print(";")
+    print("X")
 
 
 def review_borrowed_books():
@@ -144,4 +162,6 @@ def main():
 
 
 # borrow_book()
-get_books()
+# get_books()
+
+return_book()
