@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 
 def get_user_name():
@@ -47,13 +47,21 @@ def get_book(title):
         for line in file:
             if title in line:
                 parts = line.strip().split("==")
+                if len(parts) < 4:
+                    return None
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
 
 
 def get_books():
     with open("book_inventory.txt", "r") as file:
         for line in file:
-            print(line.strip())
+            parts = line.strip().split("==")
+            if len(parts) < 4:
+                return
+            book = {"title": parts[0], "author": parts[1],
+                    "in_stock": parts[2], "borrowed": parts[3]}
+            print(
+                f"{book['title']} written by {book['author']}.[{book['in_stock']}] copies available.")
 
 
 def update_inventory(title, stock, borrowed):
@@ -64,19 +72,26 @@ def update_inventory(title, stock, borrowed):
         if title in line:
             book_title, author, in_stock, out_stock = lines[i].strip().split(
                 "==")
-            lines[i] = f"{book_title}-{author}-{stock}-{borrowed}\n"
+            lines[i] = f"{book_title}=={author}=={stock}=={borrowed}\n"
             break
     with open("book_inventory.txt", "w") as file:
         file.writelines(lines)
 
 
-def update_borrowed_books(user, book):
+def update_borrowed_books(user, book, remove=False):
     with open("borrowed_books.txt", "r") as file:
         lines = file.readlines()
 
-    lines.append(f"{user['name']}-{user['memberID']}-{book}-{date.today()}\n")
     with open("borrowed_books.txt", "w") as file:
-        file.writelines(lines)
+        if remove == True:
+            for line in lines:
+                buf = line.strip("\n")
+                if buf.find(user["name"]) == -1 and buf.find(book) == -1:
+                    file.write(line)
+        else:
+            lines.append(
+                f"{user['name']}=={user['memberID']}=={book}=={date.today()}\n")
+            file.writelines(lines)
 
 
 def borrow_book():
@@ -87,10 +102,11 @@ def borrow_book():
     membership_number = get_user_ID()
     # Get a Book title
     while True:
+        get_books()
         book_title = input("Enter the book title you want to borrow: ")
         # Ensure the book title entered is valid.
         book = get_book(book_title)
-        if book == None:
+        if book is None:
             print("We do not have that book.")
             return
         if int(book["in_stock"]) == 0:
@@ -107,7 +123,41 @@ def borrow_book():
 
 
 def return_book():
-    print("X")
+    user_name = get_user_name()
+    user_ID = get_user_ID()
+    user_books = get_user_books(user_name, user_ID)
+    user_return_book = ""
+
+    if len(user_books) <= 0:
+        print("You did not borrow any book.")
+        return
+
+    for book in user_books:
+        print(
+            f"Title: {book['book_title']}\nDate of borrowing: {book['borrow_date']}\n\n")
+
+    user_return_book = input("Which book you wish to return? : ")
+    for book in user_books:
+        if book["book_title"] is user_return_book:
+            print("You did not borrowed that book.")
+            return
+        # Get book from inventor"y
+        book_inv = get_book(book["book_title"])
+        book["in_stock"] = book_inv["in_stock"]
+        book["borrowed"] = book_inv["borrowed"]
+        user_return_book = book
+    print(user_return_book)
+    date_diff = datetime.today() - \
+        datetime.strptime(user_return_book['borrow_date'], "%Y-%m-%d")
+    if date_diff.days > 7:
+        print("The book is overdue its return date!\n"
+              "You must pay penalty of 2 euros per each additional day,after its due date.\n"
+              f"Which is - €{date_diff.days*2}"
+              )
+    update_borrowed_books(
+        {"name": user_name, "memberID": user_ID}, user_return_book["book_title"], True)
+    update_inventory(user_return_book["book_title"], int(
+        user_return_book["in_stock"])+1, int(user_return_book["borrowed"])-1)
 
 
 def review_borrowed_books():
@@ -161,7 +211,6 @@ def main():
                 return
 
 
-# borrow_book()
+borrow_book()
 # get_books()
-
 return_book()
