@@ -51,6 +51,18 @@ def get_book(title):
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
 
 
+def add_new_book():
+    # TODO Validation
+    print("-Add new book to inventory-")
+    title = input("Book title: ")
+    author = input("Author: ")
+    copies = input("Copies available: ")
+    borrowed = input("Copies borrowed: ")
+
+    with open("book_inventory.txt", "a") as file:
+        file.write(f"\n{title}=={author}=={copies}=={borrowed}")
+
+
 def get_books():
     with open("book_inventory.txt", "r") as file:
         for line in file:
@@ -201,7 +213,7 @@ def manage_inventory():
     print("===Book Stock===\n")
     with open("book_inventory.txt", "r") as file:
         for line in file:
-            print(line.strip())
+            print(line.strip().split("=="))
     print("\n===Book Stock===")
 
     print("===Admin Panel===\n")
@@ -211,7 +223,7 @@ def manage_inventory():
                    " 0.Return\n")
     match choice:
         case "1":
-            borrow_book()
+            add_new_book()
         case "2":
             return_book()
         case "3":
@@ -244,8 +256,10 @@ def main():
                 return
 
 
-# borrow_book()
+# borrow_book()0
 # get_books()
 # return_book()
 # get_borrowed_books()
-review_borrowed_books()
+# review_borrowed_books()
+# manage_inventory()
+main()
