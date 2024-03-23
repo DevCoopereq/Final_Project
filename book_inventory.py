@@ -51,7 +51,7 @@ def get_book(title):
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
 
 
-def add_new_book():
+def admin_add_new_book():
     # TODO Validation
     print("-Add new book to inventory-")
     title = input("Book title: ")
@@ -65,7 +65,7 @@ def add_new_book():
     print(f"{title} has been added succesfully.")
 
 
-def remove_book():
+def admin_remove_book():
     # TODO Validation
     print("-Remove from inventory-")
     title = input("Book title: ")
@@ -82,8 +82,24 @@ def remove_book():
     print("The book the book was not removed.")
 
 
+def admin_update_inventory():
+    # Validation
+    books = get_books()
+    title = input("Which book you wish to edit: ")
+    for book in books:
+        if book["title"] == title:
+            print(f"Editing {book['title']} by {book['author']}")
+            copies = input("Enter new number of available copies: ")
+            borrowed = input("Enter new number of borrowed copies: ")
+            update_inventory(book['title'], copies, borrowed)
+            return
+
+    print("We do not have that book.")
+
+
 def get_books():
     with open("book_inventory.txt", "r") as file:
+        books = []
         for line in file:
             parts = line.strip().split("==")
             if len(parts) < 4:
@@ -91,7 +107,9 @@ def get_books():
             book = {"title": parts[0], "author": parts[1],
                     "in_stock": parts[2], "borrowed": parts[3]}
             print(
-                f"{book['title']} written by {book['author']}.[{book['in_stock']}] copies available.")
+                f"{book['title']} written by {book['author']}. Stock:[{book['in_stock']}] Borrowed:[{book['borrowed']}]")
+            books.append(book)
+        return books
 
 
 def get_borrowed_books():
@@ -242,11 +260,11 @@ def manage_inventory():
                    " 0.Return\n")
     match choice:
         case "1":
-            add_new_book()
+            admin_add_new_book()
         case "2":
-            remove_book()
+            admin_remove_book()
         case "3":
-            review_borrowed_books()
+            admin_update_inventory()
         case "4":
             manage_inventory()
         case "0":
