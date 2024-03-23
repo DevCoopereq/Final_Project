@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 
 def get_user_name():
@@ -15,7 +15,7 @@ def get_user_name():
 def get_user_ID():
     # Get Membership Number
     while True:
-        membership_number = input("Enter your nembership number: ")
+        membership_number = input("Enter nembership number: ")
         if len(membership_number) != 6 or membership_number.isnumeric() == False:
             print(
                 "Invalid Membership number. [Number must be numeric and 6 digits long.]")
@@ -26,7 +26,6 @@ def get_user_ID():
 
 def get_user_books(user_name="", user_id=""):
     user_book = []
-    print(user_name, user_id)
     if len(user_name) > 0 or len(user_id) > 0:
         with open("borrowed_books.txt", "r") as file:
             for line in file:
@@ -62,6 +61,24 @@ def get_books():
                     "in_stock": parts[2], "borrowed": parts[3]}
             print(
                 f"{book['title']} written by {book['author']}.[{book['in_stock']}] copies available.")
+
+
+def get_borrowed_books():
+    with open("borrowed_books.txt", "r") as file:
+        for line in file:
+            parts = line.strip().split("==")
+            if len(parts) < 4:
+                return
+            book = {"user": parts[0], "user_id": parts[1],
+                    "book_title": parts[2], "borrow_date": parts[3]}
+
+            borrow_date_obj = datetime.strptime(
+                book['borrow_date'], "%Y-%m-%d")
+            due_date = (borrow_date_obj + timedelta(days=7)
+                        ).strftime("%Y-%m-%d")
+            book["due_date"] = due_date
+            print(
+                f"{book['book_title']} borrowed by {book['user']} from {book['borrow_date']} to {book['due_date']}")
 
 
 def update_inventory(title, stock, borrowed):
@@ -146,7 +163,6 @@ def return_book():
         book["in_stock"] = book_inv["in_stock"]
         book["borrowed"] = book_inv["borrowed"]
         user_return_book = book
-    print(user_return_book)
     date_diff = datetime.today() - \
         datetime.strptime(user_return_book['borrow_date'], "%Y-%m-%d")
     if date_diff.days > 7:
@@ -161,7 +177,24 @@ def return_book():
 
 
 def review_borrowed_books():
-    print("Review borrowed books")
+    choice = input("1. Review all borrowed books\n"
+                   "2. Review borrowed books by Membership Number\n"
+                   ": "
+                   )
+    match choice:
+        case "1":
+            get_borrowed_books()
+        case "2":
+            user_books = get_user_books("None", get_user_ID())
+
+            for book in user_books:
+                borrow_date_obj = datetime.strptime(
+                    book['borrow_date'], "%Y-%m-%d")
+                due_date = (borrow_date_obj + timedelta(days=7)
+                            ).strftime("%Y-%m-%d")
+                book["due_date"] = due_date
+                print(
+                    f"{book['book_title']} borrowed by {book['user_name']} from {book['borrow_date']} to {book['due_date']}")
 
 
 def manage_inventory():
@@ -211,6 +244,8 @@ def main():
                 return
 
 
-borrow_book()
+# borrow_book()
 # get_books()
-return_book()
+# return_book()
+# get_borrowed_books()
+review_borrowed_books()
