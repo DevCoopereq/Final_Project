@@ -62,6 +62,25 @@ def add_new_book():
     with open("book_inventory.txt", "a") as file:
         file.write(f"\n{title}=={author}=={copies}=={borrowed}")
 
+    print(f"{title} has been added succesfully.")
+
+
+def remove_book():
+    # TODO Validation
+    print("-Remove from inventory-")
+    title = input("Book title: ")
+    with open("book_inventory.txt", "r") as file:
+        lines = file.readlines()
+
+    with open("book_inventory.txt", "w") as file:
+        for line in lines:
+            if title in line:
+                print(f"{title} has been removed succesfully.")
+                return
+            else:
+                file.write(line)
+    print("The book the book was not removed.")
+
 
 def get_books():
     with open("book_inventory.txt", "r") as file:
@@ -225,7 +244,7 @@ def manage_inventory():
         case "1":
             add_new_book()
         case "2":
-            return_book()
+            remove_book()
         case "3":
             review_borrowed_books()
         case "4":
