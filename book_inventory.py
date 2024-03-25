@@ -2,7 +2,12 @@ from datetime import date, datetime, timedelta
 
 
 def get_user_name():
-    # Get name
+    """
+    Prompts and validate user name.
+
+    Returns:
+        string: valid user name
+    """
     while True:
         user_name = input("Enter your name: ")
         if len(user_name) <= 0 or len(user_name) > 20:
@@ -13,7 +18,12 @@ def get_user_name():
 
 
 def get_user_ID():
-    # Get Membership Number
+    """
+    Prompts and validate user's membership number.
+
+    Returns:
+        string: valid membership number.
+    """
     while True:
         membership_number = input("Enter nembership number: ")
         if len(membership_number) != 6 or membership_number.isnumeric() == False:
@@ -25,6 +35,16 @@ def get_user_ID():
 
 
 def get_user_books(user_name="", user_id=""):
+    """
+    Gets all books borrowed by user.
+
+    Args:
+        user_name (str, optional): User name.
+        user_id (str, optional): User Membership number.
+
+    Returns:
+        list: Collection of borrowed books
+    """
     user_book = []
     if len(user_name) > 0 or len(user_id) > 0:
         with open("borrowed_books.txt", "r", encoding="utf-8") as file:
@@ -42,6 +62,15 @@ def get_user_books(user_name="", user_id=""):
 
 
 def get_book(title):
+    """
+    Reads book data from book_inventory.txt
+
+    Args:
+        title (string): book title
+
+    Returns:
+        dictionary: data containing information about book.
+    """
     with open("book_inventory.txt", "r", encoding="utf-8") as file:
         for line in file:
             if title in line:
@@ -52,6 +81,9 @@ def get_book(title):
 
 
 def admin_add_new_book():
+    """
+    Adds new book to the book_inventory.txt file
+    """
     # TODO Validation
     print("-Add new book to inventory-")
     title = input("Book title: ")
@@ -66,6 +98,9 @@ def admin_add_new_book():
 
 
 def admin_remove_book():
+    """
+    Removes book from book_inventory.txt file
+    """
     # TODO Validation
     print("-Remove from inventory-")
     title = input("Book title: ")
@@ -83,6 +118,9 @@ def admin_remove_book():
 
 
 def admin_update_inventory():
+    """
+    Updates available copies, and borrowed copies in book_inventory.txt
+    """
     # Validation
     books = get_books()
     title = input("\nWhich book you wish to edit: ")
@@ -98,6 +136,13 @@ def admin_update_inventory():
 
 
 def get_books():
+    """
+    Prints information about books.
+    Get books from book_inventory.txt
+
+    Returns:
+        dictionary: 'book_title', 'author','in_stock','borrowed'
+    """
     with open("book_inventory.txt", "r", encoding="utf-8") as file:
         books = []
         for line in file:
@@ -113,6 +158,10 @@ def get_books():
 
 
 def get_borrowed_books():
+    """
+    Reads books from borrowed_books.txt
+    Prints information about books.
+    """
     with open("borrowed_books.txt", "r", encoding="utf-8") as file:
         if len(file.readlines()) == 0:
             print("Nobody borrowed any book yet.")
@@ -134,6 +183,13 @@ def get_borrowed_books():
 
 
 def update_inventory(title, stock, borrowed):
+    """
+    Updates inventory
+    Args:
+        title (string): Book title
+        stock (string): Copies in inventory
+        borrowed (string): Copies borrowed.
+    """
     with open("book_inventory.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
 
@@ -148,11 +204,19 @@ def update_inventory(title, stock, borrowed):
 
 
 def update_borrowed_books(user, book, remove=False):
+    """
+    Adds/Removes entry in borrowed_books.txt
+
+    Args:
+        user (string): User name
+        book (string): Book title
+        remove (bool, optional): True if book must be removed. Defaults to False.
+    """
     with open("borrowed_books.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
 
     with open("borrowed_books.txt", "w", encoding="utf-8") as file:
-        if remove == True:
+        if remove is True:
             for line in lines:
                 buf = line.strip("\n")
                 if buf.find(user["name"]) == -1 and buf.find(book) == -1:
@@ -164,6 +228,9 @@ def update_borrowed_books(user, book, remove=False):
 
 
 def borrow_book():
+    """
+    Let's user boorrow book.
+    """
 
     # Get name
     user_name = get_user_name()
@@ -192,6 +259,10 @@ def borrow_book():
 
 
 def return_book():
+    """
+    Let's user return book
+
+    """
     user_name = get_user_name()
     user_ID = get_user_ID()
     user_books = get_user_books(user_name, user_ID)
@@ -229,6 +300,9 @@ def return_book():
 
 
 def review_borrowed_books():
+    """
+    Let's user review all borrowed books or specific users borrowed books
+    """
     choice = input("1. Review all borrowed books\n"
                    "2. Review borrowed books by Membership Number\n"
                    ": "
@@ -250,7 +324,9 @@ def review_borrowed_books():
 
 
 def manage_inventory():
-
+    """
+    Manage inventory menu
+    """
     print("===Book Stock===\n")
     get_books()
     print("\n===Book Stock===")
@@ -274,6 +350,9 @@ def manage_inventory():
 
 
 def main():
+    """
+    Main function
+    """
     while True:
         choice = input("|-Book Inventory-|\n"
                        " 1.Borrow book\n"
