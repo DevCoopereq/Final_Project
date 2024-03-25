@@ -1,1 +1,1 @@
-
+manage_inventory

@@ -27,7 +27,7 @@ def get_user_ID():
 def get_user_books(user_name="", user_id=""):
     user_book = []
     if len(user_name) > 0 or len(user_id) > 0:
-        with open("borrowed_books.txt", "r") as file:
+        with open("borrowed_books.txt", "r", encoding="utf-8") as file:
             for line in file:
                 entry = line.strip()
                 parts = entry.split("==")
@@ -42,7 +42,7 @@ def get_user_books(user_name="", user_id=""):
 
 
 def get_book(title):
-    with open("book_inventory.txt", "r") as file:
+    with open("book_inventory.txt", "r", encoding="utf-8") as file:
         for line in file:
             if title in line:
                 parts = line.strip().split("==")
@@ -59,7 +59,7 @@ def admin_add_new_book():
     copies = input("Copies available: ")
     borrowed = input("Copies borrowed: ")
 
-    with open("book_inventory.txt", "a") as file:
+    with open("book_inventory.txt", "a", encoding="utf-8") as file:
         file.write(f"\n{title}=={author}=={copies}=={borrowed}")
 
     print(f"{title} has been added succesfully.")
@@ -69,10 +69,10 @@ def admin_remove_book():
     # TODO Validation
     print("-Remove from inventory-")
     title = input("Book title: ")
-    with open("book_inventory.txt", "r") as file:
+    with open("book_inventory.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
 
-    with open("book_inventory.txt", "w") as file:
+    with open("book_inventory.txt", "w", encoding="utf-8") as file:
         for line in lines:
             if title in line:
                 print(f"{title} has been removed succesfully.")
@@ -85,10 +85,10 @@ def admin_remove_book():
 def admin_update_inventory():
     # Validation
     books = get_books()
-    title = input("Which book you wish to edit: ")
+    title = input("\nWhich book you wish to edit: ")
     for book in books:
         if book["title"] == title:
-            print(f"Editing {book['title']} by {book['author']}")
+            print(f"####Editing {book['title']} by {book['author']}####")
             copies = input("Enter new number of available copies: ")
             borrowed = input("Enter new number of borrowed copies: ")
             update_inventory(book['title'], copies, borrowed)
@@ -98,7 +98,7 @@ def admin_update_inventory():
 
 
 def get_books():
-    with open("book_inventory.txt", "r") as file:
+    with open("book_inventory.txt", "r", encoding="utf-8") as file:
         books = []
         for line in file:
             parts = line.strip().split("==")
@@ -113,7 +113,10 @@ def get_books():
 
 
 def get_borrowed_books():
-    with open("borrowed_books.txt", "r") as file:
+    with open("borrowed_books.txt", "r", encoding="utf-8") as file:
+        if len(file.readlines()) == 0:
+            print("Nobody borrowed any book yet.")
+            return
         for line in file:
             parts = line.strip().split("==")
             if len(parts) < 4:
@@ -131,24 +134,24 @@ def get_borrowed_books():
 
 
 def update_inventory(title, stock, borrowed):
-    with open("book_inventory.txt", "r") as file:
+    with open("book_inventory.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
 
     for i, line in enumerate(lines):
         if title in line:
-            book_title, author, in_stock, out_stock = lines[i].strip().split(
+            book_title, author = lines[i].strip().split(
                 "==")
             lines[i] = f"{book_title}=={author}=={stock}=={borrowed}\n"
             break
-    with open("book_inventory.txt", "w") as file:
+    with open("book_inventory.txt", "w", encoding="utf-8") as file:
         file.writelines(lines)
 
 
 def update_borrowed_books(user, book, remove=False):
-    with open("borrowed_books.txt", "r") as file:
+    with open("borrowed_books.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
 
-    with open("borrowed_books.txt", "w") as file:
+    with open("borrowed_books.txt", "w", encoding="utf-8") as file:
         if remove == True:
             for line in lines:
                 buf = line.strip("\n")
@@ -247,29 +250,27 @@ def review_borrowed_books():
 
 
 def manage_inventory():
+
     print("===Book Stock===\n")
-    with open("book_inventory.txt", "r") as file:
-        for line in file:
-            print(line.strip().split("=="))
+    get_books()
     print("\n===Book Stock===")
 
-    print("===Admin Panel===\n")
-    choice = input(" 1.Add a new book\n"
+    choice = input("===Admin Panel===\n"
+                   " 1.Add a new book\n"
                    " 2.Remove a book from inventory\n"
                    " 3.Update the total copies available, and copies borrowed\n"
-                   " 0.Return\n")
+                   " 0.Return\n"
+                   "===Admin Panel===\n")
     match choice:
         case "1":
+
             admin_add_new_book()
         case "2":
             admin_remove_book()
         case "3":
             admin_update_inventory()
-        case "4":
-            manage_inventory()
         case "0":
             return
-    print("\n===Admin Panel===")
 
 
 def main():
