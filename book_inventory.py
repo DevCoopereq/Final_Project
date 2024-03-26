@@ -1,37 +1,48 @@
 from datetime import date, datetime, timedelta
 
 
-def get_user_name():
+def validate_user_name(user_name):
     """
-    Prompts and validate user name.
+    Validates user name.
 
     Returns:
         string: valid user name
     """
-    while True:
-        user_name = input("Enter your name: ")
-        if len(user_name) <= 0 or len(user_name) > 20:
-            print("Invalid Name.")
-            continue
-        else:
-            return user_name
+    if len(user_name) > 0 and len(user_name) < 20:
+        return True
+    else:
+        return False
 
 
-def get_user_ID():
+def validate_user_ID(membership_number):
     """
-    Prompts and validate user's membership number.
+    Validates user's membership number.
 
     Returns:
         string: valid membership number.
     """
-    while True:
-        membership_number = input("Enter nembership number: ")
-        if len(membership_number) != 6 or membership_number.isnumeric() == False:
-            print(
-                "Invalid Membership number. [Number must be numeric and 6 digits long.]")
-            continue
-        else:
-            return membership_number
+    if len(membership_number) != 6 or membership_number.isnumeric() == False:
+        print(
+            "Invalid Membership number. [Number must be numeric and 6 digits long.]")
+        return False
+    else:
+        return True
+
+
+def validate_book_title(book_title):
+    print("is tru", len(book_title) <= 0)
+    # Ensure the book title entered is valid.
+    if len(book_title) <= 0:
+        return -1
+    book = get_book(book_title)
+    if book is None:
+        print("We do not have that book.")
+        return -1
+    elif int(book["in_stock"]) == 0:
+        print("Sorry but we do not have that book in the inventory.")
+        return -2
+    else:
+        return True, 0
 
 
 def get_user_books(user_name="", user_id=""):
@@ -195,10 +206,13 @@ def update_inventory(title, stock, borrowed):
 
     for i, line in enumerate(lines):
         if title in line:
-            book_title, author = lines[i].strip().split(
+            parts = lines[i].strip().split(
                 "==")
-            lines[i] = f"{book_title}=={author}=={stock}=={borrowed}\n"
-            break
+
+            if len(parts) >= 2:
+                book_title, author, in_stock, out_stock = parts
+                lines[i] = f"{book_title}=={author}=={stock}=={borrowed}\n"
+                break
     with open("book_inventory.txt", "w", encoding="utf-8") as file:
         file.writelines(lines)
 
@@ -227,35 +241,45 @@ def update_borrowed_books(user, book, remove=False):
             file.writelines(lines)
 
 
-def borrow_book():
+def borrow_book(user_name, membership_number, book_title):
     """
-    Let's user boorrow book.
+    Checks if user can borrow book,if so update inventory and borrowed book.
+
+    Args:
+        user_name (string): User name
+        membership_number (string): Membership ID
+        book_title (string): Book title 
+
+    Returns:
+        int 0: Invalid user name
+        int 00: Invalid membership number
+        int -1: If book was not found
+        int -2: If there is not available copies
+        int 1: If succesfully borrowed
     """
 
-    # Get name
-    user_name = get_user_name()
-    # Get Membership Number
-    membership_number = get_user_ID()
-    # Get a Book title
-    while True:
-        get_books()
-        book_title = input("Enter the book title you want to borrow: ")
-        # Ensure the book title entered is valid.
-        book = get_book(book_title)
-        if book is None:
-            print("We do not have that book.")
-            return
-        if int(book["in_stock"]) == 0:
-            print("Sorry but we do not have that book in the inventory.")
-            return
-        update_inventory(book["title"], int(
-            book["in_stock"])-1, int(book["borrowed"])+1)
-        print(
-            f"You have borrowed {book['title']} written by {book['author']}, please return a book back in 7 days.")
-        update_borrowed_books(
-            {"name": user_name, "memberID": membership_number},
-            book["title"])
-        return
+    if validate_user_name(user_name) is False:
+        return 0
+    if validate_user_ID(membership_number) is False:
+        return 00
+
+    is_book_valid = validate_book_title(book_title)
+    if validate_book_title(book_title) is False:
+        return 000
+    if is_book_valid == -1:
+        return -1
+    elif is_book_valid == -2:
+        return -2
+    book = get_book(book_title)
+
+    update_inventory(book["title"], int(
+        book["in_stock"])-1, int(book["borrowed"])+1)
+    print(
+        f"You have borrowed {book['title']} written by {book['author']}, please return a book back in 7 days.")
+    update_borrowed_books(
+        {"name": user_name, "memberID": membership_number},
+        book["title"])
+    return 1
 
 
 def return_book():
@@ -263,8 +287,8 @@ def return_book():
     Let's user return book
 
     """
-    user_name = get_user_name()
-    user_ID = get_user_ID()
+    user_name = validate_user_name()
+    user_ID = validate_user_ID()
     user_books = get_user_books(user_name, user_ID)
     user_return_book = ""
 
@@ -311,7 +335,7 @@ def review_borrowed_books():
         case "1":
             get_borrowed_books()
         case "2":
-            user_books = get_user_books("None", get_user_ID())
+            user_books = get_user_books("None", validate_user_ID())
 
             for book in user_books:
                 borrow_date_obj = datetime.strptime(
