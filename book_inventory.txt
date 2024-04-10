@@ -1,6 +1,6 @@
-1984==George Orwell==6==1
+1984==George Orwell==0==7
 The Great Gatsby==F. Scott Fitzgerald==10==0
-Beloved==Toni Morrison==2==1
+Beloved==Toni Morrison==0==3
 Sapiens: A Brief History of Humankind==Yuval Noah Harari==6==0
 The Alchemist==Paulo Coelho==4==0
 Educated==Tara Westover==9==0

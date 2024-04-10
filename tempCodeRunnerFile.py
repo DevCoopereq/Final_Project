@@ -1,1 +1,1 @@
-borrow_click
+borrow_book

@@ -2,12 +2,16 @@ import tkinter as tk
 from tkinter import ttk, Frame
 import book_inventory as bi
 
+entries = []
+
 
 def destroy():
     btn_borrow.pack_forget()
     btn_return.pack_forget()
     btn_review.pack_forget()
     btn_manage.pack_forget()
+    for e in entries:
+        e.pack_forget()
 
 
 def show_borrow():
@@ -36,25 +40,32 @@ def show_borrow():
     username_input_label = tk.Label(app, text="Your name:")
     username_input_label.pack()
     username_input.pack()
+    entries.append(username_input)
 
     membership_input = tk.Entry(app)
     membership_input_label = tk.Label(app, text="Membership number:")
     membership_input_label.pack()
     membership_input.pack()
+    entries.append(membership_input)
 
     book_input = tk.Entry(app)
     book_input_label = tk.Label(app, text="Book title:")
     book_input_label.pack()
     book_input.pack()
+    entries.append(book_input)
 
     btn_submit = tk.Button(
         app, command=lambda: borrow_click(username_input.get(), membership_input.get(), book_input.get()), text="Borrow")
     btn_submit.pack()
+    entries.append(btn_submit)
 
 
 def borrow_click(user, membership, book_title):
     lbl_error.pack_forget()
     borrow_succes = bi.borrow_book(user, membership, book_title)
+
+    if borrow_succes == 1:
+        show_menu()
     if borrow_succes == 0:
         lbl_error.config(text=lbl_error.cget("text")+"\nEnter valid name.")
     if borrow_succes == 00:

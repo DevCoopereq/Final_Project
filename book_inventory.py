@@ -84,11 +84,10 @@ def get_book(title):
     """
     with open("book_inventory.txt", "r", encoding="utf-8") as file:
         for line in file:
-            if title in line:
-                parts = line.strip().split("==")
-                if len(parts) < 4:
-                    return None
+            parts = line.strip().split("==")
+            if len(parts) == 4 and parts[0] == title:
                 return {"title": parts[0], "author": parts[1], "in_stock": parts[2], "borrowed": parts[3]}
+    return None
 
 
 def admin_add_new_book():
